@@ -1,0 +1,11 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server catering to need of Attendance System with Anti-Proxy frontend.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ankur Dwivedi , Roshan , Satyam Raj, Aditya Kumar",
+  "license": "ISC"
+}
