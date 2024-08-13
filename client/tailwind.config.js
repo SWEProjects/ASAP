@@ -10,6 +10,11 @@ export default {
         playfair: ['Playfair Display', 'serif'],
         poppins : ['Poppins', 'serif']
       },
+      colors: {
+        info: '#3498db',
+        infohover: "hsl(207, 50%, 53%)",
+      },
+      
     },
   },
   plugins: [

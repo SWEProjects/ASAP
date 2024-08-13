@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@font-face {
+    font-family: 'recoleta';
+    src: url('../src/assets/fonts/recoleta.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+}
+

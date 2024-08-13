@@ -4,15 +4,10 @@ import logo from "../assets/Designer.png";
 const Navbar = () => {
   return (
     <div>
-      <div className="navbar bg-[#F4A261] pt-6">
+      <div className="navbar bg-[#6EACDA] pt-4 pb-4">
         
-        <div className="navbar-start ml-5 p-1">
-          <img className="h-16 " src={logo} alt="Logo" />
-         
-        </div>
-
-        <div className="navbar-center hidden md:block mr-5">
-        <p className="text-4xl  font-bold font-poppins ml-2">The Online Attendence Portal</p>
+        <div className="navbar-start hidden md:block mr-5">
+        <p className="text-3xl  text-[#F5EDED] font-bold font-poppins ml-2">The Online Attendence Portal</p>
         </div>
 
         <div className="navbar-end">

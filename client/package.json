@@ -10,8 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "grained": "^0.0.2",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-animated-cursor": "^2.11.2",
+    "react-dom": "^18.3.1",
+    "react-noise": "^0.2.11",
+    "react-router-dom": "^6.26.0",
+    "react-spring": "^9.7.4"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

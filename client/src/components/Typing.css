@@ -1,0 +1,20 @@
+.typing-text {
+    font-size: 2em;
+    font-family: 'recoleta';
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 4px solid #333;
+    width: fit-content;
+    animation: blink-caret 0.75s step-end infinite;
+  }
+  
+  @keyframes blink-caret {
+    from, to {
+      border-color: transparent;
+    }
+    50% {
+      border-color: #333;
+    }
+  }
+  

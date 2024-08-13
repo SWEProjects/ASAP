@@ -1,0 +1,147 @@
+.signup-container {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .signup-container > .left-container {
+    flex: 1;
+  }
+  
+  .signup-container > .right-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+  }
+
+  .right-container > .welcome-message-signup{
+   font-family: 'recoleta';
+
+  }
+
+
+
+  @media (max-width: 1000px){
+    .signup-container{
+        flex-direction: column;
+    }
+
+    .right-container > .welcome-message-signup{
+        font-family: 'recoleta';
+        margin-top: 3rem;
+     
+       }
+
+
+  }
+
+  .right-container > .input-fields-signup{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+
+  }
+
+  .right-container >.input-fields-signup > .name-container{
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    
+  }
+
+  .right-container >.input-fields-signup > .section-roll-container{
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    
+  }
+
+  .right-container > .input-fields-signup >.name-container >.first{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+  }
+
+  .right-container > .input-fields-signup >.name-container >.last{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+  }
+
+  .input-style{
+    display: flex;
+    flex-direction: row;
+    
+  }
+
+  .right-container > .input-fields-signup >.section-roll-container >.roll{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+  }
+
+  .right-container > .input-fields-signup >.section-roll-container> .semester{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+  }
+
+
+.email-container-signup{
+  display: flex;
+  flex-direction: column;
+  
+  
+}
+
+.email-signup{
+  display: flex;
+  
+}
+
+.password-container-signup{
+  display: flex;
+  flex-direction: column;
+  
+  
+}
+
+.password-signup{
+  display: flex;
+  
+}
+.repassword-container-signup{
+  display: flex;
+  flex-direction: column;
+  
+  
+}
+.repassword-signup{
+  display: flex;
+  
+}
+
+
+
+
+
+
+
+  
+
+
+  
+  
