@@ -17,6 +17,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
     
   }
 
@@ -36,7 +37,8 @@
         font-family: 'recoleta';
         margin-top: 3rem;
      
-       }
+    }
+   
 
 
   }

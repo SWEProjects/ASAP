@@ -45,7 +45,7 @@ const Welcome = () => {
             <p className="text-5xl">Welcome!</p>
           </div>
           <div className="role-text text-3xl">Select your role.</div>
-          <div className="role-select md:flex md:flex-col lg:flex lg:flex-row">
+          <div className="role-select flex flex-col  lg:flex-row m-4">
             <div
               onClick={() => handleSelection("teacher")}
               className={`card bg-base-100 w-96 shadow-2xl cursor-pointer hover:opacity-70 ${
@@ -77,7 +77,7 @@ const Welcome = () => {
 
           <div className="proceed-button">
             {selected && (
-            <button  onClick={roleHandler} className="btn bg-info w-[30vw] text-white text-xl rounded-lg hover:hover:bg-infohover">Proceed</button>
+            <button  onClick={roleHandler} className="btn bg-info w-full text-white   text-xl rounded-lg hover:hover:bg-infohover">Proceed</button>
             )}
           </div>
         </div>

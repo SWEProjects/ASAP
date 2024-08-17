@@ -2,7 +2,7 @@
   "development": {
     "username": "postgres",
     "password": "1532",
-    "database": "ASAP",
+    "database": "asap",
     "host": "localhost",
     "dialect": "postgres"
   },

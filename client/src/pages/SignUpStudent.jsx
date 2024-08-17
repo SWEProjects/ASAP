@@ -1,98 +1,174 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./SignUpStudent.css";
 import signup from "../assets/signup.svg";
+import error401 from "../assets/401.svg"
 import Asap from "../components/Asap";
-import { useState } from "react";
+const apiUrl = import.meta.env.VITE_APP_API_URL;
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
+import check from "../utils/IsUserValid";
 
 const SignUpStudent = () => {
-    const rollRegex = /^[0-9]{7}(?!([a-zA-Z])\1)[a-zA-Z]{2}$/;
-    const emailRegex = /^[a-zA-Z0-9._-]+@iiitbh\.ac\.in$/i;
+  const navigate = useNavigate();
 
-    const [firstname, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [roll, setRollNumber] = useState("");
-    const [semester, setSemester] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [repassword, setRepassword] = useState("");
-    const [emptyError, setEmptyError] = useState(false);
-  
-    const registerHandler = () => {
-      if (firstname === "" || roll === "" || semester === "" || email === "" || password === "" || repassword === "") {
-        setEmptyError(true);
-        return;
-      }
-      setEmptyError(false);
+  const rollRegex = /^[0-9]{7}(?!([a-zA-Z])\1)[a-zA-Z]{2}$/;
+  const emailRegex = /^[a-zA-Z0-9._-]+@iiitbh\.ac\.in$/i;
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [roll, setRollNumber] = useState("");
+  const [semester, setSemester] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [repassword, setRepassword] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
-      let valid = true;
-      
+  const emptyFields = () => toast.error("Fields marked * cannot be empty.");
+  const rollError = () => toast.error("Use college roll only.");
+  const semesterError = () => toast.error("Enter valid semester value.");
+  const emailError = () => toast.error("Use college ID only.");
+  const passwordMismatch = () => toast.error("Password did not match.");
+  const serverError = () => toast.error("Error occurred while signing up.");
+  const networkError = () => toast.error("Error occurred, Please try again later.");
+  const userExists = () => toast.error("User already exists.");
 
-
-      if(emptyError === false){
-
-            if(rollRegex.test(roll)){
-                valid = valid & true;
-                if( document.getElementById("roll").textContent != "")  document.getElementById("roll").textContent = "";
-            }
-            else{
-                document.getElementById("roll").textContent = "Use college roll only."
-            }
-
-
-            if(semester > 0 && semester <9){
-                valid = valid & true;
-                if( document.getElementById("semester").textContent != "")  document.getElementById("semester").textContent = "";
-
-            }
-            else{
-                document.getElementById("semester").textContent = "Enter valid semester value."
-            }
-
-
-            if(emailRegex.test(email)){
-                valid = valid & true;
-                if( document.getElementById("email").textContent != "")  document.getElementById("email").textContent = "";
-
-            }
-            else{
-                  document.getElementById("email").textContent = "Use college id only";
-            }
-
-            if(password === repassword){
-                valid = valid & true;
-                if( document.getElementById("passwordError").textContent != "")  document.getElementById("passwordError").textContent = "";
-
-            }
-            else{
-                document.getElementById("passwordError").textContent = "Password did not match";
-            }
-
-
-            if(valid){
-                console.log("Ready");
-            }
-            else{
-                window.alert("Some error in validation, make sure to use official and correct data only")
-            }
-      }
-
-
-
+  useEffect(() => {
+    const checkUser = async () => {
+      const isLoggedIn = await check();
+      setLoggedIn(isLoggedIn);
+      console.log(isLoggedIn);
     };
 
-  return (
+    checkUser();
+  }, []);
+
+  const registerHandler = async () => {
+    if (
+      firstName === "" ||
+      roll === "" ||
+      semester === "" ||
+      email === "" ||
+      password === "" ||
+      repassword === ""
+    ) {
+      emptyFields();
+      return;
+    }
+
+    let valid = true;
+
+    if (!rollRegex.test(roll)) {
+      rollError();
+      valid = false;
+    }
+
+    if (!(semester > 0 && semester < 9)) {
+      semesterError();
+      valid = false;
+    }
+
+    if (!emailRegex.test(email)) {
+      emailError();
+      valid = false;
+    }
+
+    if (password !== repassword) {
+      passwordMismatch();
+      valid = false;
+    }
+
+    if (valid) {
+      setIsRegistering(true);
+      const data = { firstName, lastName, roll, semester, email, password };
+
+      try {
+        const response = await fetch(
+          `${apiUrl}/signupStudent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          toast.success(result.message);
+        } else {
+          if (result.message === "USER_EXISTS") {
+            userExists();
+          } else {
+            serverError();
+          }
+        }
+      } catch (error) {
+        networkError();
+      }
+
+      setIsRegistering(false);
+    }
+  };
+
+  const logoutHandler = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Ensure cookies are sent with the request
+      });
+
+      if (response.ok) {
+        toast.success('Logged out successfully!');
+        navigate("/");
+      } else {
+        const errorMessage = await response.text(); // Get the error message from the response
+        toast.error(`Logout failed: ${errorMessage}`);
+      }
+    } catch (error) {
+      toast.error('An error occurred during logout. Please try again.');
+    }
+  }
+
+  return loggedIn ? (
+    <div className="flex w-full h-screen flex-col md:flex-row">
+      <div className="flex-1 bg-info flex items-center justify-center p-4">
+        <Asap image={error401} />
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div
+          className="card bg-base-100 w-96 shadow-xl p-6"
+          style={{ boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.06)' }}
+        >
+          <div className="card-body">
+            <h2 className="card-title font-bold text-lg mb-4  text-info">You are already logged in.</h2>
+            <p className="mb-4">Since you are already logged in, please log out first to sign up again or go to dashboard.</p>
+            <div className="card-actions flex flex-col sm:flex-row justify-center items-center gap-4">
+              <button className="btn btn-info" onClick={() => navigate("/studentdash")}>Go to Dashboard</button>
+              <button onClick={logoutHandler} className="btn btn-info">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
     <div className="signup-container">
       <div className="left-container">
         <Asap image={signup} />
       </div>
 
       <div className="right-container">
-        <div className="welcome-message-signup text-5xl">Welcome wanderer!</div>
+        <div className="welcome-message-signup text-5xl m-5 font-black">Welcome wanderer!</div>
+        <div className="text-2xl mt-7 text-info font-medium">Enter valid details.</div>
 
-        <div className="text-2xl mt-7 text-info ">Enter valid details.</div>
-
-        <div className="input-fields-signup mt-7">
-          <div className="name-container">
+        <div className="input-fields-signup mt-7 m-7 w-[45%]">
+          <div className="name-container sm:flex-col">
             <div className="first">
               <div className="input-style">
                 <p>First Name</p>
@@ -106,9 +182,6 @@ const SignUpStudent = () => {
                 placeholder="John"
                 className="input input-bordered w-full max-w-xs mt-[-8px]"
               />
-              <div className="text-sm mt-[-8px] ml-1 text-red-600 h-3">
-                
-              </div>
             </div>
             <div className="last">
               <div className="input-style">
@@ -122,7 +195,6 @@ const SignUpStudent = () => {
                 placeholder="Doe"
                 className="input input-bordered w-full max-w-xs mt-[-8px]"
               />
-             
             </div>
           </div>
 
@@ -140,9 +212,6 @@ const SignUpStudent = () => {
                 placeholder="2201014CS"
                 className="input input-bordered w-full max-w-xs mt-[-8px]"
               />
-              <div id="roll" className="text-sm mt-[-8px] ml-1 text-red-600 h-3">
-                
-              </div>
             </div>
             <div className="semester">
               <div className="input-style">
@@ -157,13 +226,10 @@ const SignUpStudent = () => {
                 placeholder="5"
                 className="input input-bordered w-full max-w-xs mt-[-8px]"
               />
-              <div id="semester" className="text-sm mt-[-8px] ml-1 text-red-600 h-3">
-                               
-            </div>
             </div>
           </div>
 
-          <div className="email-container-signup w-[100%]">
+          <div className="email-container-signup w-full">
             <div className="email-signup">
               <p>College ID</p>
               <span className="text-red-600"> *</span>
@@ -174,11 +240,8 @@ const SignUpStudent = () => {
               }}
               type="text"
               placeholder="Type here"
-              className="input input-bordered w-[100%] "
+              className="input input-bordered w-[100%]"
             />
-            <div id="email" className="text-sm  ml-1 text-red-600 h-3">
-               
-            </div>
           </div>
 
           <div className="password-container-signup w-[100%]">
@@ -192,7 +255,7 @@ const SignUpStudent = () => {
               }}
               type="text"
               placeholder="Type here"
-              className="input input-bordered w-[100%] "
+              className="input input-bordered w-[100%]"
             />
           </div>
           <div className="repassword-container-signup w-[100%]">
@@ -206,24 +269,28 @@ const SignUpStudent = () => {
               }}
               type="text"
               placeholder="Type here"
-              className="input input-bordered w-[100%] "
+              className="input input-bordered w-[100%]"
             />
-             {emptyError &&  <div className="text-sm mt-[1px] ml-1 text-red-600 h-3">
-               <p className="text-red-600">  Field marked * can not be empty.</p>
-            </div>}
-            <div id="passwordError" className="text-sm mt-[1px] ml-1 text-red-600 h-3">
-                
-            </div>
           </div>
 
           <button
             onClick={registerHandler}
             className="btn bg-info text-white text-xl rounded-lg hover:bg-infohover w-full mt-4"
           >
-            Register
+            {isRegistering ? <span className="loading loading-ring loading-md"></span> : "Register"}
+          </button>
+
+          <button
+            onClick={() => { navigate('/loginstudent') }}
+            className="btn bg-info text-white text-xl rounded-lg hover:bg-infohover w-full mt-4"
+          >
+            Back to Login
           </button>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={5000} />
     </div>
   );
 };

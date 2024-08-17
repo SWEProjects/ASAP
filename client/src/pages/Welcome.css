@@ -9,7 +9,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: 2rem;
-    background-image: url("../assets/grainy3.svg");
+    
   }
   
   .role-select {
@@ -87,6 +87,8 @@
       flex-direction: column;
       gap: 1rem;
     }
+
+    
 
 
   
