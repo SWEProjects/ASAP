@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./LoginStudent.css";
 import login from "../assets/login.svg";
+import eyesOpen from "../assets/eyesOpen.svg"
+import eyesClosed from "../assets/eyesClosed.svg"
 import Asap from "../components/Asap";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
@@ -20,6 +22,7 @@ const LoginStudent = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const passwordInputRef = useRef(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isFetchingStatus, setIsFetchingStatus] = useState(false);
 
   const invalidEmail = () => toast.error("Enter official mail only.");
   const wrongPassword = () => toast.error("Please enter correct password.");
@@ -27,17 +30,20 @@ const LoginStudent = () => {
   const successLogin = () => toast.success("Login successful");
   const errorLogin = () => toast.error("Error during login");
   const serverError = () => toast.error("Unexpected server error");
+  const fetchError = () => toast.error("An unknown error occurred");
 
   useEffect(() => {
     const checkUser = async () => {
+      setIsFetchingStatus(true);
       const isLoggedIn = await check();
       setLoggedIn(isLoggedIn);
-      console.log(isLoggedIn);
+
     };
 
     checkUser();
-  }, []);
 
+    setIsFetchingStatus(false);
+  }, []);
 
   const logOutHandler = async () => {
     try {
@@ -46,22 +52,20 @@ const LoginStudent = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Ensure cookies are sent with the request
+        credentials: 'include',
       });
 
       if (response.ok) {
         toast.success('Logged out successfully!');
         navigate("/");
       } else {
-        const errorMessage = await response.text(); // Get the error message from the response
+        const errorMessage = await response.text();
         toast.error(`Logout failed: ${errorMessage}`);
       }
     } catch (error) {
       toast.error('An error occurred during logout. Please try again.');
     }
-  }
-
-  
+  };
 
   const togglePasswordVisibility = () => {
     const passwordInput = passwordInputRef.current;
@@ -82,7 +86,6 @@ const LoginStudent = () => {
     }
 
     const data = { email, password, isStudent: true };
-    console.log(data);
     setIsLoggingIn(true);
 
     try {
@@ -94,11 +97,9 @@ const LoginStudent = () => {
       });
 
       const result = await response.json();
-      console.log(result);
 
       if (response.ok) {
         successLogin();
-        // dispatch(checkLoginSuccess(result.isLoggedIn, result.email, result.isStudent));
         navigate('/studentdash');
       } else {
         switch (result.message) {
@@ -122,124 +123,134 @@ const LoginStudent = () => {
     }
   };
 
-  return loggedIn ? (
-<div className="flex w-full h-screen flex-col md:flex-row">
-  <div className="flex-1 bg-info flex items-center justify-center p-4">
-    <Asap image={error401} />
-  </div>
-
-  <div className="flex-1 flex items-center justify-center p-4">
-    <div
-      className="card bg-base-100 w-96 shadow-xl p-6"
-      style={{ boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.06)' }}
-    >
-      <div className="card-body">
-        <h2 className="card-title font-bold text-lg mb-4 text-info">You are already logged in.</h2>
-        <p className="mb-4">Since you are already logged in, please log out first to login again or go to dashboard.</p>
-        <div className="card-actions flex flex-col sm:flex-row justify-center items-center gap-4">
-          <button className="btn btn-info" onClick={() => navigate("/studentdash")}>Go to Dashboard</button>
-          <button onClick={logOutHandler} className="btn btn-info">Logout</button>
+  return (
+    <>
+      {isFetchingStatus ? (
+        <div className="flex justify-center flex-col align-middle items-center h-screen">
+          <span className="loading loading-spinner loading-lg"></span>
+          <div className="mt-4 text-lg">Please Wait</div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
+      ) : (
+        <>
+          {loggedIn ? (
+           <div className="flex justify-center items-start h-screen pt-10 overflow-hidden">
+           <div 
+             role="alert" 
+             className="alert shadow-xl flex flex-col md:flex-row justify-between items-center m-10 w-2/3 opacity-0 translate-y-[-100%] animate-slideDown"
+           >
+             <div className="flex items-center space-x-2">
+               <svg
+                 xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 className="stroke-info h-6 w-6 shrink-0"
+               >
+                 <path
+                   strokeLinecap="round"
+                   strokeLinejoin="round"
+                   strokeWidth="2"
+                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                 ></path>
+               </svg>
+               <span>You are already signed in!</span>
+             </div>
+             <div className="flex space-x-2 mt-4 md:mt-0">
+               <button onClick={() => {navigate("/studentdash")}} className="btn btn-sm">Go to dashboard</button>
+               <button onClick={logOutHandler} className="btn btn-sm btn-primary text-white">Logout</button>
+             </div>
+           </div>
+         </div>
+          
+          ) : (
+            <div className="outer-container">
+              <div className="left-container-login">
+                <Asap image={login} />
+              </div>
+              <div className="right-container-login">
+                <div className="login-welcome-message text-3xl mx-3">Welcome Student!</div>
+                <div className="prompt-login text-lg text-info">Enter your credentials.</div>
+                <div className="input-fields-login w-[45%]">
+                  <div className="email-login">
+                    <span className="text-md self-start">Email</span>
+                    <label className="input input-bordered flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 16 16"
+                        fill="currentColor"
+                        className="h-4 w-4 opacity-70"
+                      >
+                        <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
+                        <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+                      </svg>
+                      <input
+                        onChange={(event) => setEmail(event.target.value)}
+                        type="text"
+                        className="grow"
+                        placeholder="Email"
+                      />
+                    </label>
+                  </div>
+                  <div className="password-login">
+                    <span className="text-md self-start">Password</span>
+                    <label className="input input-bordered flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 16 16"
+                        fill="currentColor"
+                        className="h-4 w-4 opacity-70"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <input
+                        onChange={(event) => setPassword(event.target.value)}
+                        ref={passwordInputRef}
+                        type={showPassword ? "text" : "password"}
+                        className="grow"
+                        placeholder="Password"
+                      />
+                      <button onClick={togglePasswordVisibility}>
+                        {showPassword ? (
+                          <img width={"25px"} height={"25px"} src={eyesOpen} />
+                        ) : (
+                          <img width={"25px"} height={"25px"} src={eyesClosed} />
+                        )}
+                      </button>
+                    </label>
+                  </div>
+                </div>
+                <div className="login-button mt-10 ">
+                  <button
+                    type="button"
+                    className={`text-white h-10  w-52 bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 `}
+                    disabled={isLoggingIn}
+                    onClick={loginHandler}
+                  >
+                    {isLoggingIn ? <span className="loading loading-spinner loading-sm"></span> : "Login"}
+                  </button>
+                </div>
+                <div className=" flex justify-between flex-col">
+                  <a href="/forgot-password" className="text-sm text-info underline">
+                    Forgot Password?
+                  </a>
+                  <button
+                    onClick={() => { navigate("/signupstudent") }}
+                    className={`text-white mt-5  w-52 bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 `}
 
-
-
-  
-  ) : (
-    <div className="outer-container">
-      <div className="left-container-login">
-        <Asap image={login} />
-      </div>
-      <div className="right-container-login">
-        <div className="login-welcome-message text-5xl mx-3">
-          Welcome Student!
-        </div>
-
-        <div className="prompt-login text-3xl text-info">
-          Enter your credentials.
-        </div>
-
-        <div className="input-fields-login w-[45%]">
-          <div className="email-login">
-            <span className="text-md self-start"> Email</span>
-            <label className="input input-bordered flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                className="h-4 w-4 opacity-70"
-              >
-                <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-                <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
-              </svg>
-              <input
-                onChange={(event) => setEmail(event.target.value)}
-                type="text"
-                className="grow"
-                placeholder="Email"
-              />
-            </label>
-          </div>
-
-          <div className="password-login">
-            <span className="text-md self-start">Password</span>
-            <label className="input input-bordered flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                className="h-4 w-4 opacity-70"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <input
-                onChange={(event) => setPassword(event.target.value)}
-                type={showPassword ? "text" : "password"}
-                ref={passwordInputRef}
-              />
-            </label>
-            <div className="flex flex-row items-center gap-3 justify-end">
-              <input
-                type="checkbox"
-                checked={showPassword}
-                onChange={togglePasswordVisibility}
-                className="checkbox size-5 ml-1 checkbox-info"
-              />
-              <span>Show password</span>
+                  >
+                    Go to Registration
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="login-container w-[45%]">
-          <button
-            onClick={loginHandler}
-            className="btn bg-info mt-16 text-white text-xl rounded-lg hover:bg-infohover"
-            disabled={isLoggingIn}
-          >
-            {isLoggingIn ? <span className="loading loading-ring loading-md"></span> : "Login"}
-          </button>
-          <div className="link mt-2">Forget Password</div>
-        </div>
-
-        <div className="signup-prompt mt-11 w-[45%] pb-8">
-          <div className="text-xl text-info">New Student?</div>
-          <button
-            onClick={() => navigate("/signupstudent")}
-            className="btn bg-info text-white text-xl rounded-lg hover:bg-infohover"
-          >
-            Signup
-          </button>
-        </div>
-      </div>
-      <ToastContainer position="top-right" autoClose={5000} />
-    </div>
+          )}
+        </>
+      )}
+      <ToastContainer />
+    </>
   );
 };
 

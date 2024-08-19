@@ -8,9 +8,9 @@ const Asap = ({image}) => {
 
   return (
 
-    <div className='parent-container-asap'>
+    <div className='parent-container-asap h-screen'>
       <div className='img-container-asap'>
-        <img height={"700px"} width={"700px"} src={image} alt="Description" />
+        <img  height={"600px"} width={"600px"} src={image} alt="Description" />
       </div>
       <div className='text-container-asap p-4 text-white'>
          Automated attendance portal <br/> with anti-proxy system.

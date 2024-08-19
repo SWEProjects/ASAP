@@ -9,13 +9,13 @@
      flex-direction: column;
      justify-content: center;
      align-items: center;
-     height: 100vh;
+    
      background-color: #3498db;
 }
 
 .text-container-asap{
     font-family: "recoleta";
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 600;
     text-align: center;
 }
